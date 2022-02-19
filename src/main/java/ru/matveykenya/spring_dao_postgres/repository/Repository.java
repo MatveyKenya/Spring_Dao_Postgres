@@ -1,34 +1,32 @@
 package ru.matveykenya.spring_dao_postgres.repository;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.jdbc.core.namedparam.SqlParameterSource;
-import org.springframework.jdbc.support.rowset.SqlRowSet;
-import org.springframework.lang.Nullable;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @org.springframework.stereotype.Repository
 public class Repository {
     private final String myScript = read("query1.sql");
 
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
+    private final NamedParameterJdbcTemplate npJdbcTemplate;
+
+    public Repository(NamedParameterJdbcTemplate npJdbcTemplate) {
+        this.npJdbcTemplate = npJdbcTemplate;
+    }
 
     public List<String> getProductName(String name){
-        var sqlRowSet = jdbcTemplate.queryForRowSet(myScript, name);
+        var queryForList = npJdbcTemplate.queryForList(myScript, Map.of("name",name));
         List<String> list = new ArrayList<>();
-        while(sqlRowSet.next()){
-            list.add(sqlRowSet.getString("product_name"));
+        for (Map<String,Object> item:queryForList) {
+            list.add(item.get("product_name").toString());
         }
         return list;
     }
