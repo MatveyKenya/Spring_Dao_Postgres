@@ -12,7 +12,7 @@ public class Service {
         this.repository = repository;
     }
 
-    public List<String> getProductName(String name) {
+    public List<?> getProductName(String name) {
         return repository.getProductName(name);
     }
 }
